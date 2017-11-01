@@ -1,0 +1,324 @@
+= Programmation en Java : exceptions et fichiers
+François Roland <francois.roland@umons.ac.be>
+2017-10-31
+:icons: font
+:experimental:
+ifdef::backend-html5[]
+:source-highlighter: highlightjs
+endif::[]
+ifdef::backend-pdf[]
+:source-highlighter: coderay
+:notitle:
+
+[discrete]
+= {doctitle}
+endif::[]
+
+Durant cette séance, nous allons étudier les mécanismes de gestion d'exceptions et ceux de la lecture et l'écriture de fichiers.
+
+== Notions
+
+=== Traitement des exceptions
+
+==== Motivation
+
+Lorsque je programme, j'aime me concentrer sur le scénario principal, celui où tout se passe comme prévu.
+Prendre en compte tous les scénarios alternatifs rendrait très vite le code illisible.
+C'est pour permettre cette lisibilité que le mécanisme des exceptions a été créé.
+Lorsqu'une exception est lancée, elle permet de créer un court-circuit à travers le code afin de pouvoir traiter ces cas exceptionnels à l'endroit adéquat.
+
+Il existe plusieurs manières de gérer une exception :
+
+* atteindre le but poursuivi d'une autre manière
+** en utilisant un autre service
+** en utilisant un autre moyen de communication
+** en utilisant une réponse à partir d'un cache
+* en ré-essayant (retry mechanism)
+* en enregistrant un message de service (logging)
+* en affichant un message à l'utilisateur
+
+A chaque endroit dans le code où une exception peut être interceptée, nous devons choisir entre appliquer une de ces stratégies ou laisser remonter cette exception.
+Laisser remonter l'exception signifie que, ne pouvant pas prendre de bonne décision à un endroit donné, nous choisissons de reporter cette décision dans le code de l'appelant.
+
+Ceci étant dit, l'utilisation des exceptions doit rester, comme son nom l'indique, exceptionnelle.
+
+==== Syntaxe
+
+[source,java]
+.Structure try - catch - finally
+----
+try {
+    ... // <1>
+} catch (Exception1 | Exception2 e) {
+    ... // <2>
+} catch (Exception3 e) {
+    ...
+} finally {
+    ... // <3>
+}
+----
+<1> Cette partie du code est celle où une exception peut être lancée, où remonter d'un bout du code appelé.
+<2> Cette partie est appelée uniquement si une exception du type `Exception1` ou `Exception2` est captée dans la première partie.
+Il est possible de créer différents blocs d'instructions pour répondre différemment à différents types d'exception.
+<3> Ce dernier bloc sera exécuté après les 2 autres, quoi qu'il arrive.
+Son but est de s'assurer que le système reste dans un état correct.
+Il permet de libérer les ressources utilisées.
+
+[TIP]
+====
+Les clauses `catch` et `finally` sont optionnelles (il en faut au moins une des deux).
+On peut donc créer des structures
+
+[source,java]
+----
+try {
+    ...
+} catch (...) {
+    ...
+}
+----
+
+ou
+
+[source,java]
+----
+try {
+    ...
+} finally {
+    ...
+}`
+----
+
+====
+
+==== Type d'exception
+
+Le langage Java fournit 2 types d'exceptions.
+
+[[catched-exceptions]]
+===== Catched exceptions
+
+Ces exceptions descendent de la classe `java.lang.Exception`.
+Nous devons les traiter explicitement, soit dans un block `catch`, soit avec une clause `throws` dans la signature de la méthode.
+`IOException` est un bon exemple de _catched exceptions_.
+
+[source,java]
+.Clause `throws`
+----
+private void doSomethingThatThrowsException() throws ACatchedException {
+    ...
+    if (somethingIsWrong()) {
+        throw new ACatchedException();
+    }
+    ...
+}
+----
+
+La figure <<ioexception-hierarchy>> donne un bon exemple d'exceptions qui
+
+[[ioexception-hierarchy]]
+.Hiérarchie de `IOException`
+image::IOException-hierarchy.svg[]
+
+===== Runtime exceptions
+
+Ces exceptions étendent toutes `java.lang.RuntimeException`.
+
+Contrairement aux <<catched-exceptions>>, les runtime exceptions ne nous forcent pas à les traiter immédiatement.
+Elles peuvent concerner des situations imprévisibles telle que `ConcurrentModificationException`.
+Elles concernent souvent des données liées à un usage incorrect telles que `ArithmeticException`, `IllegalArgumentExcption` ou `NullPointerException`.
+
+La tendance est de privilégier les runtime exceptions parce qu'elles imposent moins de contraintes.
+Il m'arrive souvent de créer un nombre restreint de points d'entrées dans une application et d'y concentrer la gestion des exceptions.
+Je peux ainsi arrêter l'exécution de mon programme à n'importe quel endroit tout en gardant une gestion d'erreur consistante.
+
+=== Fichiers et flux de données
+
+Java considère que chaque fichier est un flot séquentiel d'octets.
+Un flot classique utilisé depuis le début des séances de TP est System.out ;
+ce dernier permet d'envoyer des informations vers la sortie standard (la console).
+On distingue également System.in (flot d'entrée standard : le clavier) et System.err (flot d'erreur standard : la console).
+La gestion de fichier se fait à l'aide des classes du package java.io . Les classes suivantes sont couramment utilisées :
+: pour l'entrée d'octets à partir d'un fichier;
+
+* FileInputStream
+* FileOutputStream
+* FileReader : pour l'entrée de caractères à partir d'un fichier;
+* FileWriter : pour la sortie de caractères vers un fichier.
+
+: pour la sortie d'octets vers un fichier;
+
+Il est également possible d'enregistrer directement des objets sans devoir stocker manuellement chaque attribut de l'objet.
+Cela est rendu possible grâce à l'implémentation de l'interface java.io.Serializable dans la déclaration de la classe.
+De cette manière, les objets instanciés à partir de cette classe pourront être utilisés avec ObjectInputStream et ObjectOutputStream .
+
+NOTE: il est important que toutes les variables d'instance de la classe implémentent également l'interface Serializable.
+
+Une classe très utile en vue de naviguer dans le système de fichiers est la classe JFileChooser du package javax.swing.
+Cette classe présente des méthodes showOpenDialog et showSaveDialog permettant l'ouverture d'une boîte de dialogue de choix d'un fichier (respectivement en vue de l'ouvrir ou d'y enregistrer des informations).
+La méthode getSelectedFile retourne un lien vers le fichier sélectionné ; ce lien sera enregistré dans un objet File qui sera le descripteur de fichier.
+L'ouverture du flux se fait alors de la manière suivante :
+ObjectOutputStream sortie = new ObjectOutputStream( new FileOutputStream( nomDeFichier )); où nomDeFichier est un objet de type File.
+L'enregistrement d'un objet dans le fichier se fera à l'aide de la méthode writeObject de la classe ObjectOutputStream et la fermeture du descripteur de fichier sera réalisée par la méthode close.
+La lecture d'un objet depuis un fichier se fera à l'aide de la méthode readObject de la classe ObjectInputStream; celle­ci renvoie un objet générique Object qui devra donc être transtypé suivant le type d'objet à lire.
+Par exemple :
+Enregistrement enregistrement = (Enregistrement) entree.readObject();
+
+NOTE: une erreur lors d'un accès à un fichier lancera une exception du type IOException.
+
+== Exercices
+
+=== Exercice 1
+
+entiers.
+Cet exercice permettra de comprendre la gestion des exceptions en réalisant un quotient de deux
+Ce quotient sera d'abord réalisé sans gestion d'erreur. Ensuite, la gestion d'erreur sera ajoutée au
+code existant et se fera à deux niveaux:
+
+* entrée d'un caractère à la place d'un entier;
+* entrée d'un dénominateur nul.
+
+NOTE: un moyen pour identifier le type d'exception lancée lors d'une erreur d'exécution est
+d'observer la console lorsque l'on fait volontairement planter le programme. Un autre moyen est
+de consulter les pages de manuel des méthodes utilisées et d'en identifier les exceptions possibles.
+
+=== Exercice 2
+
+On souhaite gérer une liste de personnes dont le nom, le prénom et l'âge doivent pouvoir être
+obtenus. Une classe Personne sera donc créée et testée dans une seconde classe TestPersonne . Cette
+dernière définira différentes méthodes permettant:
+
+* l'ouverture d'un fichier;
+* l'enregistrement de personnes dans un fichier;
+* la lecture de personnes depuis un fichier;
+* la fermeture d'un fichier.
+
+=== Exercice 3
+
+L'exercice sur les formes géométriques du TP précédent sera repris en vue d'y apporter les
+modifications suivantes:
+
+* possibilité d'enregistrer la liste des formes géométriques;
+* possibilité de récupérer à partir d'un fichier la liste de formes géométriques.
+
+La gestion des erreurs se fera à deux niveaux:
+
+* gérer les exceptions d'accès au système de fichier;
+* tester le caractère convexe des polygones introduits par l'utilisateur.
+
+Indication:
+sin 
+a, 
+b=
+
+∥
+a ∥∥ b∥
+
+a =a x , a y  et 
+b=b x , b y 
+
+== Annexes
+
+=== Exceptions du package java.lang (sauf AWTError qui se trouve dans java.awt )
+
+Error
+LinkageError
+ClassCircularityError
+ClassFormatError
+ExceptionInInitializerError
+IncompatibleClhassChangeError
+AbstractMethodError
+IllegalAccessError
+InstantiationError
+NoSuchFieldError
+NoSuchMethodError
+NoClassDefFoudError
+UnsatisfiedLinkError
+VerifyError
+ThreadDeath
+VirtualMachineError
+InternalError
+OutOfMemoryError
+StackOverflowError
+UnknownError
+AWTError
+Exception
+ClassNotFoundException
+CloneNotSupportedException
+IllegalAccessException
+InstantiationException
+InterruptedException
+NoSuchFieldException
+NoSuchMethodException
+RuntimeException
+ArithmeticException
+ArrayStoreException
+ClassCastException
+IllegalArgumentException
+IllegalThreadStateException
+NumberFormatException
+IllegalMonitorStateException
+IllegalStateException
+IndexOutOfBoundsException
+ArrayIndexOutOfBoundsException
+StringIndexOutOfBoundsException
+NegativeArraySizeException
+NullPointerException
+SecurityException
+
+=== Exceptions du package java.util
+
+Exception
+RuntimeException
+EmptyStackException
+MissingResourceException
+NoSuchElementException
+TooManyListenersException
+
+=== Exceptions du package java.io
+
+Exception
+IOException
+CharConversionException
+EOFException
+FileNotFoundException
+InterruptedIOException
+ObjeectStreamException
+InvalidClassException
+InvalidObjectException
+NotActiveException
+NotSerializableException
+OptionalDataException
+StreamCorruptedException
+WriteAbortedException
+SyncFailedException
+UnsupportedCodingException
+UTFDataFormatException
+
+=== Exceptions du package java.awt
+Exception
+AWTException
+RuntimeException
+IllegalStateException
+IllegalComponentStateException
+
+=== Exceptions du package java.net
+
+Exception
+IOException
+BindException
+MalformedURLException
+ProtocolException
+SocketException
+ConnectException
+NoRouteToHostException
+UnknownHostException
+UnknownServiceException
+
+[bibliography]
+== Références
+
+* Deitel, H. M. & Deitel, P. J. (2002), _JAVA Comment programmer – Quatrième édition_. Les éditions Reynald Goulet INC.
+* Manneback, P. & Frémal, S. (2014-2015) _Travaux pratiques de Méthodologie et Langage de Programmation_. UMons.
+* Manneback, P. (2005-2006) _Méthodologie et Langages de Programmation_. UMons.
+* _Java Platform Standard Edition 8 Documentation_. Récupéré de https://docs.oracle.com/javase/8/docs/

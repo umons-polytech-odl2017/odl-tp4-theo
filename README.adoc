@@ -1,0 +1,5 @@
+= TP ODL - programmation Java: classes abstraites et interfaces
+François Roland <francois.roland@umons.ac.be>
+2017-10-23
+
+Ce repository contient le code nécessaire à la 3ème séance de travaux pratiques.

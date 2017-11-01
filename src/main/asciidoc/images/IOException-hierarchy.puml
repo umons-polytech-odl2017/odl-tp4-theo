@@ -1,0 +1,28 @@
+@startuml
+
+package (java.lang) {
+	class Object
+	class Throwable
+	class Exception
+}
+
+Object <|-- Throwable
+Throwable <|-- Exception
+
+package (java.io) {
+	class IOException
+	class EOFException
+	class MalformedURLException
+	class FileNotFoundException
+	class UnknownHostException
+	class SocketException
+}
+
+Exception <|- IOException
+IOException <|-- EOFException
+IOException <|-- SocketException
+IOException <|--- FileNotFoundException
+IOException <|--- UnknownHostException
+IOException <|--- MalformedURLException
+
+@enduml
