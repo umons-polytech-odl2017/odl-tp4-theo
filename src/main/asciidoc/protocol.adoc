@@ -215,10 +215,20 @@ Java 7 nous a apporté beaucoup de facilités pour manipuler les fichiers.
 Path filePath = Paths.get("/home/user/myfile.txt");
 Charset utf8Charset = Charset.forName("UTF-8");
 try (BufferedReader reader = Files.newBufferedReader(filePath, utf8Charset)) {
-    ...
+    reader.lines().forEach(line -> ...);
 }
 ----
 
+[source,java]
+.Sérialisation d'un objet.
+----
+Path filePath = Paths.get("/home/user/mydata.ser");
+try (OutputStream output = Files.newOutputStream(filePath)) {
+    ObjectOutput objectOutput = new ObjectOutputStream(output);
+    MySerializableObject obj = new MySerializableObject();
+	objectOutput.writeObject(obj)
+}
+----
 
 
 '''
