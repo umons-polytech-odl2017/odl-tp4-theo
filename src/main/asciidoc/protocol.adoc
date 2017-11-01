@@ -118,7 +118,7 @@ La figure <<ioexception-hierarchy>> donne un bon exemple d'exceptions qui
 
 [[ioexception-hierarchy]]
 .Hiérarchie de `IOException`
-image::IOException-hierarchy.svg[]
+image::IOException-hierarchy.svg[align="center", scaledwidth="80%"]
 
 ===== Runtime exceptions
 
@@ -143,12 +143,12 @@ Le premier critère est la direction du flux.
 Nous parlons d'input stream ou flux entrant lorsque nous lisons les données depuis une source vers le programme.
 
 .Oracle. _Input stream_. Sur Oracle Java Documentation docs.oracle.com (en ligne). Page consultée le 01/11/2017. https://docs.oracle.com/javase/tutorial/essential/io/streams.html
-image::io-ins.gif[]
+image::io-ins.png[align="center", scaledwidth="60%"]
 
 Nous parlons d'output stream ou flux sortant lorsque nous écrivons les données du programme vers une destination.
 
 .Oracle. _Output stream_. Sur Oracle Java Documentation docs.oracle.com (en ligne). Page consultée le 01/11/2017. https://docs.oracle.com/javase/tutorial/essential/io/streams.html
-image::io-outs.gif[]
+image::io-outs.png[align="center", scaledwidth="60%"]
 
 Le second critère de classification différencie les flux de données binaires des flux de données sous forme de caractères.
 Ce classement est représenté par les 4 classes abstraites suivantes :
@@ -172,6 +172,8 @@ Ce classement est représenté par les 4 classes abstraites suivantes :
 De ces classes abstraites descendent toute une hiérarchie de classes.
 Certaines servent à accéder aux différents types de sources ou destinations de données.
 Les autres permettent de décorer (design pattern décorateur) un flux (cryptage, compression, buffer, ...).
+
+NOTE: Les flux `System.in`, `System.out` et `System.err` permettent de travailler avec les flux standards du processus.
 
 [WARNING]
 ====
@@ -203,6 +205,8 @@ Cette documentation décrit également comment gérer l'évolution dans le temps
 
 Pour lire et écrire ces objets, nous utilisons les implémentations des interfaces `java.io.ObjectInput` et `java.io.ObjectOutput`.
 
+TIP: Pour qu'une classe soit sérialisable, il faut que toutes les classes qu'elle référence soient sérialisable.
+
 ===== Manipulation des fichiers
 
 Java 7 nous a apporté beaucoup de facilités pour manipuler les fichiers.
@@ -230,46 +234,15 @@ try (OutputStream output = Files.newOutputStream(filePath)) {
 }
 ----
 
-
 '''
-
-Java considère que chaque fichier est un flot séquentiel d'octets.
-Un flux classique utilisé depuis le début des séances de TP est System.out ; ce dernier permet d'envoyer des informations vers la sortie standard (la console).
-On distingue également System.in (flux d'entrée standard : le clavier) et System.err (flux d'erreur standard : la console).
-La gestion de fichier se fait à l'aide des classes du package java.io.
-Les classes suivantes sont couramment utilisées :
-
-* FileInputStream: pour l'entrée d'octets à partir d'un fichier;
-* FileOutputStream: pour la sortie d'octets vers un fichier;
-* FileReader : pour l'entrée de caractères à partir d'un fichier;
-* FileWriter : pour la sortie de caractères vers un fichier.
-
-Il est également possible d'enregistrer directement des objets sans devoir stocker manuellement chaque attribut de l'objet.
-Cela est rendu possible grâce à l'implémentation de l'interface java.io.Serializable dans la déclaration de la classe.
-De cette manière, les objets instanciés à partir de cette classe pourront être utilisés avec ObjectInputStream et ObjectOutputStream.
-
-NOTE: il est important que toutes les variables d'instance de la classe implémentent également l'interface Serializable.
-
-Une classe très utile en vue de naviguer dans le système de fichiers est la classe JFileChooser du package javax.swing.
-Cette classe présente des méthodes showOpenDialog et showSaveDialog permettant l'ouverture d'une boîte de dialogue de choix d'un fichier (respectivement en vue de l'ouvrir ou d'y enregistrer des informations).
-La méthode getSelectedFile retourne un lien vers le fichier sélectionné ; ce lien sera enregistré dans un objet File qui sera le descripteur de fichier.
-L'ouverture du flux se fait alors de la manière suivante :
-ObjectOutputStream sortie = new ObjectOutputStream( new FileOutputStream( nomDeFichier )); où nomDeFichier est un objet de type File.
-L'enregistrement d'un objet dans le fichier se fera à l'aide de la méthode writeObject de la classe ObjectOutputStream et la fermeture du descripteur de fichier sera réalisée par la méthode close.
-La lecture d'un objet depuis un fichier se fera à l'aide de la méthode readObject de la classe ObjectInputStream; celle­ci renvoie un objet générique Object qui devra donc être transtypé suivant le type d'objet à lire.
-Par exemple :
-Enregistrement enregistrement = (Enregistrement) entree.readObject();
-
-NOTE: une erreur lors d'un accès à un fichier lancera une exception du type IOException.
 
 == Exercices
 
 === Exercice 1
 
-entiers.
-Cet exercice permettra de comprendre la gestion des exceptions en réalisant un quotient de deux
-Ce quotient sera d'abord réalisé sans gestion d'erreur. Ensuite, la gestion d'erreur sera ajoutée au
-code existant et se fera à deux niveaux:
+Cet exercice permettra de comprendre la gestion des exceptions en réalisant un quotient de deux entiers.
+Ce quotient sera d'abord réalisé sans gestion d'erreur.
+Ensuite, la gestion d'erreur sera ajoutée au code existant et se fera à deux niveaux:
 
 * entrée d'un caractère à la place d'un entier;
 * entrée d'un dénominateur nul.
@@ -302,16 +275,12 @@ La gestion des erreurs se fera à deux niveaux:
 * gérer les exceptions d'accès au système de fichier;
 * tester le caractère convexe des polygones introduits par l'utilisateur.
 
-Indication:
-sin 
-a, 
-b=
-
-∥
-a ∥∥ b∥
-
-a =a x , a y  et 
-b=b x , b y 
+[TIP]
+====
+Si l'on prend les sommets dans l'ordre et que l'on considère chaque couple de segments successifs, un polygone est convexe si les sinus de l'angle entre ces couples sont tous positifs ou tous négatifs.
+
+image::convex-polygon-test.svg[align="center", scaledwidth="40%"]
+====
 
 [bibliography]
 == Références
