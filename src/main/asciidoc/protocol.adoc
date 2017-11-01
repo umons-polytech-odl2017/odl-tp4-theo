@@ -134,23 +134,109 @@ Je peux ainsi arrêter l'exécution de mon programme à n'importe quel endroit t
 
 === Fichiers et flux de données
 
-Java considère que chaque fichier est un flot séquentiel d'octets.
-Un flot classique utilisé depuis le début des séances de TP est System.out ;
-ce dernier permet d'envoyer des informations vers la sortie standard (la console).
-On distingue également System.in (flot d'entrée standard : le clavier) et System.err (flot d'erreur standard : la console).
-La gestion de fichier se fait à l'aide des classes du package java.io . Les classes suivantes sont couramment utilisées :
-: pour l'entrée d'octets à partir d'un fichier;
+==== Flux de données
 
-* FileInputStream
-* FileOutputStream
+===== Classification
+
+L'API Java classe les flux I/O selon 2 critères.
+Le premier critère est la direction du flux.
+Nous parlons d'input stream ou flux entrant lorsque nous lisons les données depuis une source vers le programme.
+
+.Oracle. _Input stream_. Sur Oracle Java Documentation docs.oracle.com (en ligne). Page consultée le 01/11/2017. https://docs.oracle.com/javase/tutorial/essential/io/streams.html
+image::io-ins.gif[]
+
+Nous parlons d'output stream ou flux sortant lorsque nous écrivons les données du programme vers une destination.
+
+.Oracle. _Output stream_. Sur Oracle Java Documentation docs.oracle.com (en ligne). Page consultée le 01/11/2017. https://docs.oracle.com/javase/tutorial/essential/io/streams.html
+image::io-outs.gif[]
+
+Le second critère de classification différencie les flux de données binaires des flux de données sous forme de caractères.
+Ce classement est représenté par les 4 classes abstraites suivantes :
+
+.Classement des flux I/O en Java
+[cols="h,2*", options="header"]
+|===
+|
+|Input
+|Output
+
+|Données binaires
+|InputStream
+|OutputStream
+
+|Caractères
+|Reader
+|Writer
+|===
+
+De ces classes abstraites descendent toute une hiérarchie de classes.
+Certaines servent à accéder aux différents types de sources ou destinations de données.
+Les autres permettent de décorer (design pattern décorateur) un flux (cryptage, compression, buffer, ...).
+
+[WARNING]
+====
+Fermer vos flux lorsqu'ils ne sont plus nécessaire est très important.
+Si vous oubliez de fermer un flux, la ressource restera utilisée au niveau système jusqu'à la fin du processus de votre logiciel.
+Depuis Java 7, il existe une manière simple de s'assurer que les ressources soient fermées :
+
+[source,java]
+.Structure try with resources
+----
+try (BufferedReader br = new BufferedReader(new FileReader(path))) {
+    return br.readLine();
+}
+----
+
+L'alternative consiste à appeler la méthode `close()` dans un bloc `finally`.
+====
+
+===== Sérialisation
+
+Nous parlons de sérialisation lorsque nous transformons un objet en mémoire en un flux binaire.
+Nous parlons de désérialisation pour l'opération réciproque.
+
+Pour sérialiser ou désérialiser un objet, cet objet doit implémenter l'interface `java.io.Serializable`.
+Cette interface est une interface de _marquage_.
+Elle nous permet de signaler à la JVM que nous avons analyser la structure d'une classe et estimé qu'elle répond à une série de critères.
+Ces critères sont détaillés dans la https://docs.oracle.com/javase/8/docs/api/java/io/Serializable.html[Javadoc de l'interface].
+Cette documentation décrit également comment gérer l'évolution dans le temps de la structure d'une classe sérialisée.
+
+Pour lire et écrire ces objets, nous utilisons les implémentations des interfaces `java.io.ObjectInput` et `java.io.ObjectOutput`.
+
+===== Manipulation des fichiers
+
+Java 7 nous a apporté beaucoup de facilités pour manipuler les fichiers.
+`java.nio.file.Paths` offre plusieurs méthodes pour localiser un fichier dans le système de fichier.
+`java.nio.file.Files` permet de manipuler ces fichiers.
+
+[source,java]
+.Lecture d'un fichier texte.
+----
+Path filePath = Paths.get("/home/user/myfile.txt");
+Charset utf8Charset = Charset.forName("UTF-8");
+try (BufferedReader reader = Files.newBufferedReader(filePath, utf8Charset)) {
+    ...
+}
+----
+
+
+
+'''
+
+Java considère que chaque fichier est un flot séquentiel d'octets.
+Un flux classique utilisé depuis le début des séances de TP est System.out ; ce dernier permet d'envoyer des informations vers la sortie standard (la console).
+On distingue également System.in (flux d'entrée standard : le clavier) et System.err (flux d'erreur standard : la console).
+La gestion de fichier se fait à l'aide des classes du package java.io.
+Les classes suivantes sont couramment utilisées :
+
+* FileInputStream: pour l'entrée d'octets à partir d'un fichier;
+* FileOutputStream: pour la sortie d'octets vers un fichier;
 * FileReader : pour l'entrée de caractères à partir d'un fichier;
 * FileWriter : pour la sortie de caractères vers un fichier.
 
-: pour la sortie d'octets vers un fichier;
-
 Il est également possible d'enregistrer directement des objets sans devoir stocker manuellement chaque attribut de l'objet.
 Cela est rendu possible grâce à l'implémentation de l'interface java.io.Serializable dans la déclaration de la classe.
-De cette manière, les objets instanciés à partir de cette classe pourront être utilisés avec ObjectInputStream et ObjectOutputStream .
+De cette manière, les objets instanciés à partir de cette classe pourront être utilisés avec ObjectInputStream et ObjectOutputStream.
 
 NOTE: il est important que toutes les variables d'instance de la classe implémentent également l'interface Serializable.
 
@@ -216,104 +302,6 @@ a ∥∥ b∥
 
 a =a x , a y  et 
 b=b x , b y 
-
-== Annexes
-
-=== Exceptions du package java.lang (sauf AWTError qui se trouve dans java.awt )
-
-Error
-LinkageError
-ClassCircularityError
-ClassFormatError
-ExceptionInInitializerError
-IncompatibleClhassChangeError
-AbstractMethodError
-IllegalAccessError
-InstantiationError
-NoSuchFieldError
-NoSuchMethodError
-NoClassDefFoudError
-UnsatisfiedLinkError
-VerifyError
-ThreadDeath
-VirtualMachineError
-InternalError
-OutOfMemoryError
-StackOverflowError
-UnknownError
-AWTError
-Exception
-ClassNotFoundException
-CloneNotSupportedException
-IllegalAccessException
-InstantiationException
-InterruptedException
-NoSuchFieldException
-NoSuchMethodException
-RuntimeException
-ArithmeticException
-ArrayStoreException
-ClassCastException
-IllegalArgumentException
-IllegalThreadStateException
-NumberFormatException
-IllegalMonitorStateException
-IllegalStateException
-IndexOutOfBoundsException
-ArrayIndexOutOfBoundsException
-StringIndexOutOfBoundsException
-NegativeArraySizeException
-NullPointerException
-SecurityException
-
-=== Exceptions du package java.util
-
-Exception
-RuntimeException
-EmptyStackException
-MissingResourceException
-NoSuchElementException
-TooManyListenersException
-
-=== Exceptions du package java.io
-
-Exception
-IOException
-CharConversionException
-EOFException
-FileNotFoundException
-InterruptedIOException
-ObjeectStreamException
-InvalidClassException
-InvalidObjectException
-NotActiveException
-NotSerializableException
-OptionalDataException
-StreamCorruptedException
-WriteAbortedException
-SyncFailedException
-UnsupportedCodingException
-UTFDataFormatException
-
-=== Exceptions du package java.awt
-Exception
-AWTException
-RuntimeException
-IllegalStateException
-IllegalComponentStateException
-
-=== Exceptions du package java.net
-
-Exception
-IOException
-BindException
-MalformedURLException
-ProtocolException
-SocketException
-ConnectException
-NoRouteToHostException
-UnknownHostException
-UnknownServiceException
 
 [bibliography]
 == Références
