@@ -247,14 +247,9 @@ Des tests unitaires dans `src/test/java/exercise1` vous permettront d'évaluer v
 
 === Exercice 2
 
-On souhaite gérer une liste de personnes dont le nom, le prénom et l'âge doivent pouvoir être
-obtenus. Une classe Personne sera donc créée et testée dans une seconde classe TestPersonne . Cette
-dernière définira différentes méthodes permettant:
+Le package `exercise2` contient une série de classes. Vous devez modifier ces classes et implémenter les méthodes `save` et `load` de la classe `Exercise2`.
 
-* l'ouverture d'un fichier;
-* l'enregistrement de personnes dans un fichier;
-* la lecture de personnes depuis un fichier;
-* la fermeture d'un fichier.
+Ici encore, lest tests unitaires de `src/test/java/exercise2` vous aideront à évaluer votre avancement.
 
 === Exercice 3
 
