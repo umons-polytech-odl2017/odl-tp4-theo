@@ -238,10 +238,12 @@ try (OutputStream output = Files.newOutputStream(filePath)) {
 
 === Exercice 1
 
-La méthode `Exercise1#quotient` calcule le résultat de la division d'un numérateur par un dénominateur.
+Dans la classe `ExceptionThrower`, implémentez la méthode `throwACustomExceptionWhenValueIs42` de manière à ce qu'une exception soit lancée lorsque le paramètre de la méthode vaut 42.
+Cette exception devra être une exception runtime que vous aurez créée.
 
-* entrée d'un caractère à la place d'un entier;
-* entrée d'un dénominateur nul.
+Dans la classe `ExceptionCatcher`, modifiez la méthode `executeExceptionThrowerSafely` de manière à récupérer cette exception pour qu'elle ne remonte pas au dehors de cette méthode.
+
+Des tests unitaires dans `src/test/java/exercise1` vous permettront d'évaluer votre avancement.
 
 === Exercice 2
 
