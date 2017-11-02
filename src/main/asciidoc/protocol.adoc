@@ -234,22 +234,14 @@ try (OutputStream output = Files.newOutputStream(filePath)) {
 }
 ----
 
-'''
-
 == Exercices
 
 === Exercice 1
 
-Cet exercice permettra de comprendre la gestion des exceptions en réalisant un quotient de deux entiers.
-Ce quotient sera d'abord réalisé sans gestion d'erreur.
-Ensuite, la gestion d'erreur sera ajoutée au code existant et se fera à deux niveaux:
+La méthode `Exercise1#quotient` calcule le résultat de la division d'un numérateur par un dénominateur.
 
 * entrée d'un caractère à la place d'un entier;
 * entrée d'un dénominateur nul.
-
-NOTE: un moyen pour identifier le type d'exception lancée lors d'une erreur d'exécution est
-d'observer la console lorsque l'on fait volontairement planter le programme. Un autre moyen est
-de consulter les pages de manuel des méthodes utilisées et d'en identifier les exceptions possibles.
 
 === Exercice 2
 
@@ -275,10 +267,14 @@ La gestion des erreurs se fera à deux niveaux:
 * gérer les exceptions d'accès au système de fichier;
 * tester le caractère convexe des polygones introduits par l'utilisateur.
 
-[TIP]
+[NOTE]
 ====
-Si l'on prend les sommets dans l'ordre et que l'on considère chaque couple de segments successifs, un polygone est convexe si les sinus de l'angle entre ces couples sont tous positifs ou tous négatifs.
+Soit un polygone défini par l'ensemble de ses sommets.
+Ce polygone est convexe si le sinus de l'angle entre chaque couple de segments successifs est toujours positif ou toujours négatif.
 
+Le sinus de l'angle entre 2 segments peut être obtenu à l'aide de la formule ci-dessous.
+
+.Calcul du sinus de l'angle entre 2 segments
 image::convex-polygon-test.svg[align="center", scaledwidth="40%"]
 ====
 
