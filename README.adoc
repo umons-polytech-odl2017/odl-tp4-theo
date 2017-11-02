@@ -1,6 +1,6 @@
 = TP ODL - programmation Java: classes abstraites et interfaces
 François Roland <francois.roland@umons.ac.be>
-2017-10-31
+2017-11-02
 
 Ce repository contient le code nécessaire à la 4ème séance de travaux pratiques.
 Cette séance se concentre sur la gestion des exceptions et la lecture et l'écriture de fichiers.
